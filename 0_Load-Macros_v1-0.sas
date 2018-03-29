@@ -1,4 +1,18 @@
+﻿/************************************/
+/* Version 1.0  					*/
+/* Date: 29.03.2018 				*/
+/* created by: Tobias Göllner 		*/
+/* @TobiasGold on GitHub 			*/
+/************************************/
 
+/************************************/
+/* This code creates all the macros.*/
+/* Run this first and don't close 	*/
+/* the SAS session.					*/
+/***********************************/
+
+/* This is from http://support.sas.com/kb/45/805.html 	*/
+/* The only change is the %include statement 			*/
 %macro drive(dir,ext);                                                                                                                  
   %local filrf rc did memcnt name f;                                                                                                    
                                                                                                                                                                                                
@@ -14,7 +28,7 @@
                                                                                                                                                                                                                                      
      %let name=%qsysfunc(dread(&did,&f));                                                                                                                                                                                                                                                                                                       
       %if %qupcase(%qscan(&name,-1,.)) = %upcase(&ext) %then %do;                                                                       
-        %include "&dir\&name";                                                                                                                
+/*changed here*/  %include "&dir\&name";                                                                                                                
       %end;                                                                                                                                                                                                                    
       %else %if %qscan(&name,2,.) = %then %do;                                                                                          
         %drive(&dir\%unquote(&name),&ext)                                                                                               
@@ -28,6 +42,7 @@
 %mend drive;
 
 
+/* This is the data creation macro */
 %macro createdata(yr_from=5, yr_to=15, fileoption=1, countries=all, vars=);
 
 %local n i;
@@ -195,7 +210,7 @@ run;
 
 %mend createdata;
 
-
+/* This merges the four files together */
 %macro mergefiles();
 
 data households(drop=rc);
@@ -269,6 +284,7 @@ run;
 
 %mend mergefiles;
 
+/* This fixes the number of deaths if an entrie household dies */
 %macro hhdeathfix();
 
 /* first fix the deaths where an entire household dies */
@@ -321,7 +337,7 @@ run;
 
 %mend hhdeathfix;
 
-
+/* The first data processing step */
 %macro dataproc();
 
 	/*Add Perso_ID variable and create date Variables */ 
@@ -438,7 +454,7 @@ run;
 
 	run;
 
-	/*Sort */ 
+	/*Sort*/ 
 	proc sort data=merge_all_work_mod3 out=merge_all_work_mod4;
 	by PS_ID Year_Survey;
 	run;
@@ -449,13 +465,13 @@ run;
 	by PS_ID;
 	Died=.;
 
-	if rb110=6 then Died = 1; /* died */
-	if rb110=5 then Died = -1; /* moved out or last interview if not contacted previous wave*/
-	if rb110=1 then Died = 0; /*current household member, was in HH prev wave*/
-	if rb110=2 then Died = 0; /*moved into this HH from other sample HH*/
-	if rb110=3 then Died = 0; /* moved into this HH from outside sample */
-	if rb110=4 then Died = 0; /* newly born into HH */
-	if rb110=7 then Died = 0; /* lived in HH for at least 3 monhts (inc ref per) not recorded in the register of this HH */
+	if rb110=6 then Died = 1; 	/* died */
+	if rb110=5 then Died = -1; 	/* moved out or last interview if not contacted previous wave */
+	if rb110=1 then Died = 0; 	/* current household member, was in HH prev wave */
+	if rb110=2 then Died = 0; 	/* moved into this HH from other sample HH */
+	if rb110=3 then Died = 0; 	/* moved into this HH from outside sample */
+	if rb110=4 then Died = 0; 	/* newly born into HH */
+	if rb110=7 then Died = 0; 	/* lived in HH for at least 3 monhts (inc ref per) not recorded in the register of this HH */
 
 	if last.PS_ID then do;
 		if db110=5 then Died=1;
@@ -484,7 +500,7 @@ run;
 
 %mend dataproc;
 
-
+/* This creates two files, one with the first observation and one with the last observation of a person */
 %macro infos(firstvars=, lastvars=);
 		
 	/*create first entry for every person*/
@@ -509,11 +525,7 @@ run;
 
 %mend infos;
 
-
-
-/* last steps */
-/* maximum years of Luxembourg should be dynamic! */ 
-
+/* The second data processing step */
 %macro dataproc2();
 	/*add variable Verweildauer */
 	data mortality_SILC_2;
@@ -559,11 +571,11 @@ run;
 	IF Died = -1 then Died = 0;
 	IF Dat_Death then dt_exit=Dat_Death;
 	IF Dat_Cens then dt_exit=Dat_Cens;
-	/* yydx = year(Dat_Survey); */
-	/* not needed, this is year of the survey */
-	year_of_death = year(Dat_Death);
 	format dt_exit Dat_Death Dat_Cens Dat_Survey Dat_Birth ddmmyy10.;
 	run;
 
 %mend dataproc2;
 
+/***********/
+/*** END ***/
+/***********/
