@@ -1,6 +1,6 @@
 ﻿/************************************/
-/* Version 1.0  					*/
-/* Date: 29.03.2018 				*/
+/* Version 1.0.1  					*/
+/* Date: 04.04.2018 				*/
 /* created by: Tobias Göllner 		*/
 /* @TobiasGold on GitHub 			*/
 /************************************/
@@ -9,7 +9,7 @@
 /* This code creates all the macros.*/
 /* Run this first and don't close 	*/
 /* the SAS session.					*/
-/***********************************/
+/************************************/
 
 /* This is from http://support.sas.com/kb/45/805.html 	*/
 /* The only change is the %include statement 			*/
@@ -50,7 +50,7 @@
 %global dvars hvars pvars rvars;
 
 %global luyr;
-%let luyr = %eval(&yr_to - &yr_from + 4);
+%let luyr = %eval(&yr_to - &yr_from + 4); /* this could use some rethinking */
 
 %let n = %sysfunc(countw(&list));
 %do i=1 %to &n;
@@ -100,7 +100,7 @@ run;
 	keep HB010 HB020 HB030 HB050 HB060 h_release &hvars;
 		%end;
 		%else %if &file=p %then %do;	
-	keep PB010 PB020 PB030 PB100 PB110 PB130 PB140 PB150 p_release &pvars;
+	keep PB010 PB020 PB030 PB100 PB110 p_release &pvars;
 		%end;
 		%else %if &file=r %then %do;
 	keep RB010 RB020 RB030 RB040 RB070 RB080 RB090 RB110 RB140 RB150 RX010 r_release &rvars;
@@ -163,7 +163,7 @@ run;
 		keep HB010 HB020 HB030 HB050 HB060 h_release &hvars;
 	%end;
 	%else %if &file=p %then %do;	
-		keep PB010 PB020 PB030 PB100 PB110 PB130 PB140 PB150 p_release &pvars;
+		keep PB010 PB020 PB030 PB100 PB110 p_release &pvars;
 	%end;
 	%else %if &file=r %then %do;
 		keep RB010 RB020 RB030 RB040 RB070 RB080 RB090 RB110 RB140 RB150 RX010 r_release &rvars;
@@ -539,8 +539,13 @@ run;
 	data mortality_SILC_agefix;
 	set mortality_SILC_2;
 	age=.;
-		if Age_Survey = . or Age_Survey in (-1 -2 81) then age=int(calc_age);
+
+		if Age_Survey=. then age=int(calc_age);
+		else if Age_Survey=-1 then age=int(calc_age);
+		else if Age_Survey=-2 then age=int(calc_age);
+		else if Age_Survey=81 then age=int(calc_age);
 			else age=Age_Survey;
+
 	run;
 
 	/* LU has permanent panel. change to apropriate value */
