@@ -1,5 +1,5 @@
-﻿/************************************/
-/* Version 1.0.1  					*/
+/************************************/
+/* Version 1.0.2  					*/
 /* Date: 04.04.2018 				*/
 /* created by: Tobias Göllner 		*/
 /* @TobiasGold on GitHub 			*/
@@ -511,7 +511,7 @@ run;
 	RUN;
 
 	/*create last entry for every person*/
-	data last (keep= PS_ID old_PS_ID Died Dat_Death Dat_Cens rb110 db110 &lastvars);
+	data last (keep= PS_ID Died Dat_Death Dat_Cens rb110 db110 &lastvars);
 	set eusilc.mortality_SILC_0;
 	by PS_ID;
 	if last.PS_ID;
