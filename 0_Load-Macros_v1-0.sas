@@ -1,4 +1,4 @@
-/************************************/
+﻿/************************************/
 /* Version 1.0.2  					*/
 /* Date: 04.04.2018 				*/
 /* created by: Tobias Göllner 		*/
@@ -213,40 +213,34 @@ run;
 /* This merges the four files together */
 %macro mergefiles();
 
-data households(drop=rc);
+/* re-rolling to a prior version */
+/* hashing had some unexpected side-effects */
+/* might add this again later */ 
 
-LENGTH Country $ 2 ;
-if 0 then set eusilc.h_base;
-
-declare Hash MatchIDs (dataset:'eusilc.h_base');
-rc=MatchIDs.defineKey("Country", "HH_ID", "Year_Survey");
-rc=MatchIDs.defineData(all:"yes");
-rc=MatchIDs.defineDone();
-
-do until(eof);
-	set eusilc.d_base end=eof;
-	rc=MatchIDs.find();
-	output;
-end;
-stop;
+proc sort data=eusilc.d_base;
+by Country HH_ID Year_Survey;
 run;
 
+proc sort data=eusilc.h_base;
+by Country HH_ID Year_Survey;
+run;
 
-data persons(drop=rc);
-LENGTH Country $ 2 ;
-if 0 then set eusilc.p_base;
+data households;
+merge eusilc.h_base eusilc.d_base (in=inD);
+if inD;
+run;
 
-declare Hash MatchIDs (dataset:'eusilc.p_base');
-rc=MatchIDs.defineKey("Country", "PS_ID", "Year_Survey");
-rc=MatchIDs.defineData(all:"yes");
-rc=MatchIDs.defineDone();
+proc sort data=eusilc.r_base;
+by Country PS_ID Year_Survey;
+run;
 
-do until(eof);
-	set eusilc.r_base end=eof;
-	rc=MatchIDs.find();
-	output;
-end;
-stop;
+proc sort data=eusilc.p_base;
+by Country PS_ID Year_Survey;
+run;
+
+data persons;
+merge eusilc.p_base eusilc.r_base (in=inR);
+if inR;
 run;
 
 /* fix reassigned IDs */
