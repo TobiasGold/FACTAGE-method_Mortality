@@ -1,6 +1,6 @@
 ﻿/************************************/
-/* Version 1.0.2  					*/
-/* Date: 04.04.2018 				*/
+/* Version 1.0.3  					*/
+/* Date: 25.04.2018 				*/
 /* created by: Tobias Göllner 		*/
 /* @TobiasGold on GitHub 			*/
 /************************************/
@@ -227,6 +227,7 @@ run;
 
 data households;
 merge eusilc.h_base eusilc.d_base (in=inD);
+by Country HH_ID Year_Survey;
 if inD;
 run;
 
@@ -240,6 +241,7 @@ run;
 
 data persons;
 merge eusilc.p_base eusilc.r_base (in=inR);
+by Country PS_ID Year_Survey;
 if inR;
 run;
 
