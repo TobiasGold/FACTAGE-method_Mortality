@@ -21,3 +21,9 @@ By default, the output file contains several variables which are necessary for d
 ## How to use
 
 The provided pdf document should answer all questions.  Please read it carefully before submitting any questions. Alternatively, read the wiki page.
+
+## FACTAGE reports on differential mortality
+
+Klotz, J. & Göllner, T. (2017). Estimating Differential Mortality from EU-SILC Longitudinal Data. A Feasibility Study. FACTAGE project report. 
+
+Download the [research report](https://www.factage.eu/pubs/FACTAGE_STAT_D4-1_Report_final.pdf) or the [policy brief](https://www.factage.eu/pubs/FACTAGE_STAT_D4-1_Policy_Brief_final.pdf).
