@@ -1,6 +1,6 @@
 ﻿/************************************/
-/* Version 1.0  					*/
-/* Date: 29.03.2018 				*/
+/* Version 1.0.2  					*/
+/* Date: 04.04.2018 				*/
 /* created by: Tobias Göllner 		*/
 /* @TobiasGold on GitHub 			*/
 /************************************/
@@ -9,7 +9,7 @@
 /* This code creates all the macros.*/
 /* Run this first and don't close 	*/
 /* the SAS session.					*/
-/***********************************/
+/************************************/
 
 /* This is from http://support.sas.com/kb/45/805.html 	*/
 /* The only change is the %include statement 			*/
@@ -50,7 +50,7 @@
 %global dvars hvars pvars rvars;
 
 %global luyr;
-%let luyr = %eval(&yr_to - &yr_from + 4);
+%let luyr = %eval(&yr_to - &yr_from + 4); /* this could use some rethinking */
 
 %let n = %sysfunc(countw(&list));
 %do i=1 %to &n;
@@ -100,7 +100,7 @@ run;
 	keep HB010 HB020 HB030 HB050 HB060 h_release &hvars;
 		%end;
 		%else %if &file=p %then %do;	
-	keep PB010 PB020 PB030 PB100 PB110 PB130 PB140 PB150 p_release &pvars;
+	keep PB010 PB020 PB030 PB100 PB110 p_release &pvars;
 		%end;
 		%else %if &file=r %then %do;
 	keep RB010 RB020 RB030 RB040 RB070 RB080 RB090 RB110 RB140 RB150 RX010 r_release &rvars;
@@ -163,7 +163,7 @@ run;
 		keep HB010 HB020 HB030 HB050 HB060 h_release &hvars;
 	%end;
 	%else %if &file=p %then %do;	
-		keep PB010 PB020 PB030 PB100 PB110 PB130 PB140 PB150 p_release &pvars;
+		keep PB010 PB020 PB030 PB100 PB110 p_release &pvars;
 	%end;
 	%else %if &file=r %then %do;
 		keep RB010 RB020 RB030 RB040 RB070 RB080 RB090 RB110 RB140 RB150 RX010 r_release &rvars;
@@ -213,40 +213,34 @@ run;
 /* This merges the four files together */
 %macro mergefiles();
 
-data households(drop=rc);
+/* re-rolling to a prior version */
+/* hashing had some unexpected side-effects */
+/* might add this again later */ 
 
-LENGTH Country $ 2 ;
-if 0 then set eusilc.h_base;
-
-declare Hash MatchIDs (dataset:'eusilc.h_base');
-rc=MatchIDs.defineKey("Country", "HH_ID", "Year_Survey");
-rc=MatchIDs.defineData(all:"yes");
-rc=MatchIDs.defineDone();
-
-do until(eof);
-	set eusilc.d_base end=eof;
-	rc=MatchIDs.find();
-	output;
-end;
-stop;
+proc sort data=eusilc.d_base;
+by Country HH_ID Year_Survey;
 run;
 
+proc sort data=eusilc.h_base;
+by Country HH_ID Year_Survey;
+run;
 
-data persons(drop=rc);
-LENGTH Country $ 2 ;
-if 0 then set eusilc.p_base;
+data households;
+merge eusilc.h_base eusilc.d_base (in=inD);
+if inD;
+run;
 
-declare Hash MatchIDs (dataset:'eusilc.p_base');
-rc=MatchIDs.defineKey("Country", "PS_ID", "Year_Survey");
-rc=MatchIDs.defineData(all:"yes");
-rc=MatchIDs.defineDone();
+proc sort data=eusilc.r_base;
+by Country PS_ID Year_Survey;
+run;
 
-do until(eof);
-	set eusilc.r_base end=eof;
-	rc=MatchIDs.find();
-	output;
-end;
-stop;
+proc sort data=eusilc.p_base;
+by Country PS_ID Year_Survey;
+run;
+
+data persons;
+merge eusilc.p_base eusilc.r_base (in=inR);
+if inR;
 run;
 
 /* fix reassigned IDs */
@@ -511,7 +505,7 @@ run;
 	RUN;
 
 	/*create last entry for every person*/
-	data last (keep= PS_ID old_PS_ID Died Dat_Death Dat_Cens rb110 db110 &lastvars);
+	data last (keep= PS_ID Died Dat_Death Dat_Cens rb110 db110 &lastvars);
 	set eusilc.mortality_SILC_0;
 	by PS_ID;
 	if last.PS_ID;
@@ -539,8 +533,13 @@ run;
 	data mortality_SILC_agefix;
 	set mortality_SILC_2;
 	age=.;
-		if Age_Survey = . or Age_Survey in (-1 -2 81) then age=int(calc_age);
+
+		if Age_Survey=. then age=int(calc_age);
+		else if Age_Survey=-1 then age=int(calc_age);
+		else if Age_Survey=-2 then age=int(calc_age);
+		else if Age_Survey=81 then age=int(calc_age);
 			else age=Age_Survey;
+
 	run;
 
 	/* LU has permanent panel. change to apropriate value */
