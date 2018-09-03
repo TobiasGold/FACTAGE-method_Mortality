@@ -25,6 +25,7 @@ The provided pdf document should answer all questions.  Please read it carefully
 ## News
 
 17/07/2018: Updated the pdf document. These changes are not yet in the wiki.
+
 03/09/2018: Uploaded the first draft of the R code, which is a "translation" from the SAS code.
 
 
