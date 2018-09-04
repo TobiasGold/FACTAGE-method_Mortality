@@ -17,7 +17,7 @@ Apart from path specifications, the SAS code consists of several SAS macros. Two
 
 By default, the output file contains several variables which are necessary for differential mortality analyses, such as sex, age, country, year of first interview, and vital status information. In addition, the user may specify the analytical variables by which mortality risk should be compared later, for example educational level or occupational class. These analytical variables may be measured either at the first interview (the baseline) or at the last interview of a respondent. The output file is available in SAS format and by default also in csv format.
 
-The R code is analogous to the SAS code, a seperate manual is not planned.
+The R code is analogous to the SAS code, a seperate extensive manual is not planned, but a small guide.
 
 ## How to use
 
@@ -29,7 +29,7 @@ To understand the R code please also consult the manual to get an idea of the co
 
 17/07/2018: Updated the pdf document. These changes are not yet in the wiki.
 
-03/09/2018: Uploaded the first draft of the R code, which is a "translation" from the SAS code. (No manual yet!)
+03/09/2018: Uploaded the first draft of the R code, which is a "translation" from the SAS code. (No guide yet!)
 
 
 ## FACTAGE report on differential mortality
