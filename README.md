@@ -37,3 +37,5 @@ To understand the R code please also consult the manual to get an idea of the co
 Klotz, J. & Göllner, T. (2017). Estimating Differential Mortality from EU-SILC Longitudinal Data. A Feasibility Study. FACTAGE project report. 
 
 Download the [research report](https://www.factage.eu/pubs/FACTAGE_STAT_D4-1_Report_final.pdf) or the [policy brief](https://www.factage.eu/pubs/FACTAGE_STAT_D4-1_Policy_Brief_final.pdf).
+
+http://dx.doi.org/10.11587/ZOOBKE
