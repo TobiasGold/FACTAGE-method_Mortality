@@ -31,7 +31,7 @@ To understand the R code please also consult the manual to get an idea of the co
 
 03/09/2018: Uploaded the first draft of the R code, which is a "translation" from the SAS code. (No guide yet!)
 
-21/05/2019: We are currently revising the draft of the R code. Expect news and a release soon!
+21/05/2019: [b]We are currently revising the draft of the R code. Expect news and a release soon![/b]
 
 
 ## FACTAGE report on differential mortality
