@@ -1,32 +1,30 @@
-## Version 1.0.0 # Date: 22.05.2018 # created by: Johannes Klotz ##
+## Version 1.1.0 # Date: 13.06.2019 # created by: Johannes Klotz, Tobias Göllner ##
 ## This is an exemplary analysis in R. This is to illustrate a potential application.	##
 
-# Set the working directory
-setwd ("C:/path/to-your/directory")
+# optional: to get the first survey year
+SILC_UDB_X$FirstSurveyYear <- year(SILC_UDB_X$EntryDate)
 
-# (Install and) load special packages
-install.packages (c("haven", "survival"))
+# restrict useable ages
+SILC_UDB_X_age <- SILC_UDB_X[between(AgeBaseline, 16, 79), ]
+# only use valid duration times
+SILC_UDB_X_age <- SILC_UDB_X_age[DurationTime > 0, ]
+
 library (haven)
 library (survival)
 
-# Import the sas file
-silc_full <- read_sas ("silc_full.sas7bdat")
-
-
 # Model I: Estimating mortality hazard ratio by household income category
+analysis <- SILC_UDB_X_age[ which(AgeBaseline >= 30 & AgeBaseline <= 79 & HY020_baseline > 0),]
 
-# First, data modification
-# Attention: R is case-sensitive!
-attach (silc_full)
-analysis <- silc_full [ which(age >= 30 & age <= 79 & HY020 > 0),]
-detach (silc_full)
-
-attach (analysis)
-analysis$income_group [HY020 < 10000] <- 1
-analysis$income_group [HY020 >= 10000 & HY020 <= 30000] <- 2
-analysis$income_group [HY020 > 30000] <- 3
-detach (analysis)
+analysis$income_group[analysis$HY020_baseline < 10000] <- 1
+analysis$income_group[analysis$HY020_baseline >= 10000 & analysis$HY020_baseline <= 30000] <- 2
+analysis$income_group[analysis$HY020_baseline > 30000] <- 3
 
 # Then, the Proportional Hazards Regression
-Model_I <- coxph (Surv(time=Verweildauer, event=Died) ~ age + factor(income_group, levels = c(2,1,3)), data = analysis)
+Model_I <- coxph(Surv(time=DurationTime, event=Died) ~ AgeBaseline + factor(income_group, levels = c(2,1,3)), data = analysis)
 summary(Model_I)
+
+# An alternative model with Sex as stratifier
+Model_IIa <- coxph(Surv(time=DurationTime, event=Died) ~ AgeBaseline + factor(income_group, levels = c(2,1,3)), subset = Country=="AT", data = analysis)
+summary(Model_IIa)
+Model_IIb <- coxph(Surv(time=DurationTime, event=Died) ~ AgeBaseline + factor(income_group, levels = c(2,1,3)), subset = Country=="PL", data = analysis)
+summary(Model_IIb)
