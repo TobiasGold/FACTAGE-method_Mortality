@@ -33,6 +33,8 @@ To understand the R code please also consult the manual to get an idea of the co
 
 21/05/2019: We are currently revising the draft of the R code. Expect news and a release soon!
 
+23/07/2019: R-code is online
+
 
 ## FACTAGE report on differential mortality
 
